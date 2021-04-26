@@ -35,9 +35,9 @@ AttributeEnd
 
 # Dome
 AttributeBegin
-    Material "matte" "color Kd" [.8 .1 .1]
+    Material "wood"
     Translate 0 0 3
-    Shape "sphere" "float radius" [3] "float phimax" [45] "float zmax" [3]
+    Shape "sphere" "float radius" [3]
 AttributeEnd
 
 WorldEnd

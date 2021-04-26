@@ -90,7 +90,7 @@ struct Interaction {
         CHECK_EQ(mediumInterface.inside, mediumInterface.outside);
         return mediumInterface.inside;
     }
-
+public:
     // Interaction Public Data
     Point3f p;
     Float time;

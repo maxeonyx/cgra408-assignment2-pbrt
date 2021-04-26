@@ -117,6 +117,7 @@
 
 #include <map>
 #include <stdio.h>
+#include <materials/wood.h>
 
 namespace pbrt {
 
@@ -541,6 +542,8 @@ std::shared_ptr<Material> MakeMaterial(const std::string &name,
         return nullptr;
     else if (name == "matte")
         material = CreateMatteMaterial(mp);
+    else if (name == "wood")
+        material = CreateSolidWoodMaterial(mp);
     else if (name == "plastic")
         material = CreatePlasticMaterial(mp);
     else if (name == "translucent")
