@@ -3,4 +3,4 @@ cd build
 cmake ..
 make
 and cd ..
-and build/pbrt
+and build/pbrt $argv

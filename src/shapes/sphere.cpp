@@ -43,8 +43,32 @@ namespace pbrt {
 // Sphere Method Definitions
 Bounds3f Sphere::ObjectBound() const {
 
+    if (phiMax < Pi/2) {
+        float ymin = 0;
+        float xmin = 0;
+        float xmax = radius;
+        float ymax = sin(phiMax) * radius;
+
+        return Bounds3f(Point3f(xmin, ymin, zMin),
+                    Point3f(xmax, ymax, zMax));
+    } else if (phiMax < Pi) {
+        float ymin = 0;
+        float xmin = -sin(phiMax - Pi/2) * radius;
+        float xmax = radius;
+        float ymax = radius;
+        return Bounds3f(Point3f(xmin, ymin, zMin),
+                    Point3f(xmax, ymax, zMax));
+    } else if (phiMax < 3*Pi/2) {
+        float ymin = -sin(phiMax) * radius;
+        float xmin = -radius;
+        float xmax = radius;
+        float ymax = radius;
+        return Bounds3f(Point3f(xmin, ymin, zMin),
+                    Point3f(xmax, ymax, zMax));
+    }
+
     return Bounds3f(Point3f(-radius, -radius, zMin),
-                    Point3f(radius, radius, zMax));
+                Point3f(radius, radius, zMax));
 }
 
 bool Sphere::Intersect(const Ray &r, Float *tHit, SurfaceInteraction *isect,
