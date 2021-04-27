@@ -1,0 +1,55 @@
+
+Film "image" "integer xresolution" [900] "integer yresolution" [540]
+  "string filename" "f14-5.exr"
+
+Sampler "halton" "integer pixelsamples" [8]
+#Sampler "halton" "integer pixelsamples" [32]
+#Sampler "halton" "integer pixelsamples" [256]
+
+Integrator "path" "integer maxdepth" 1
+
+#LookAt 400 -400 400  0 80 -50 0 0 1
+#LookAt 277 -240 250  0 60 -30 0 0 1
+#Rotate 30 0 0 1
+LookAt 500 -100 300 0 100 -60  0 0 1
+#Camera "perspective" "float fov" [38]
+Camera "perspective" "float fov" [32]
+
+WorldBegin
+
+AttributeBegin
+Rotate 90 0 0 1
+Rotate -90 1 0 0
+LightSource "infinite" "string mapname"
+    "textures/20060807_wells6_hd.exr"   "color scale" [2.5 2.5 2.5]
+AttributeEnd
+
+AttributeBegin
+Texture "lines" "color" "imagemap" "string filename" "textures/lines.exr"
+Material "matte"
+ "color Kd" [.1 .1 .1]
+Translate 0 0 -40
+Shape "trianglemesh"
+   "point P" [ -1000 -1000 0   1000 -1000 0   1000 1000 0 -1000 1000 0 ]
+   "float uv" [ 0 0 1 0 1 1 0 1 ]
+	"integer indices" [ 0 1 2 2 3 0]
+AttributeEnd
+
+
+AttributeBegin
+Translate -60 -60 0
+Rotate -53 0 1 0
+Material "fourier" "string bsdffile" "bsdfs/coated_copper.bsdf"
+#Material "glass" "float uroughness" .1 "float vroughness" .1
+Shape "plymesh" "string filename" "geometry/dragon_remeshed.ply"
+AttributeEnd
+
+AttributeBegin
+Translate 110 110 0
+Rotate -53 0 1 0
+Material "fourier" "string bsdffile" "bsdfs/ceramic.bsdf"
+#Material "glass" "float uroughness" .1 "float vroughness" .1
+Shape "plymesh" "string filename" "geometry/dragon_remeshed.ply"
+AttributeEnd
+
+WorldEnd

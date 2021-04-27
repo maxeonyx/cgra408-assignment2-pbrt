@@ -20,9 +20,11 @@ namespace pbrt {
             bool allowMultipleLobes
     ) const {
 
-        Point3f p = si->p;
+        Point3f p = si->p * (1/scale);
 
         FastNoiseLite n = FastNoiseLite();
+
+        // TODO: random darkness amount by distance
 
         double val1 = n.GetNoise(p.x*100,p.y*100,p.z*10)*0.5 + 0.5;
         double val2 = n.GetNoise(p.x*100 + 11,p.y*100 + 11,p.z*10 + 11)*0.5 + 0.5;
@@ -32,21 +34,27 @@ namespace pbrt {
         double big_dist = warp_dist * 10;
         double fine_dist = warp_dist * 60;
         double small_rings = std::sin(fine_dist) * 0.5 + 0.5;
-        double big_rings = std::sin(big_dist) * 0.5 + 0.5;
 
         double sawtooth = -std::cos(big_dist - std::cos(big_dist - std::cos(big_dist - std::cos(big_dist)))) * 0.5 + 0.5;
         double val = 0.3 * small_rings + 0.7 * sawtooth;
 
-        float color1[3] = {(float)0xba/0xff, (float)0x3e/0xff, (float)0x12/0xff};
-        RGBSpectrum color1_s = RGBSpectrum::FromRGB(color1);
-        float color2[3] = {(float)0x63/0xff, (float)0x23/0xff, (float)0x0b/0xff};
-        RGBSpectrum color2_s = RGBSpectrum::FromRGB(color2);
-
-        Spectrum color = val * color1_s + (1-val)*color2_s;
+        Spectrum diffuse = val * color1 + (1-val)*color2;
 
         si->bsdf = ARENA_ALLOC(arena, BSDF)(*si);
 
-        si->bsdf->Add(ARENA_ALLOC(arena, LambertianReflection)(color));
+        Spectrum specular = Ks->Evaluate(*si).Clamp();
+        Float roughu = nu->Evaluate(*si);
+        Float roughv = nv->Evaluate(*si);
+
+        if (!diffuse.IsBlack() || !specular.IsBlack()) {
+            if (remapRoughness) {
+                roughu = TrowbridgeReitzDistribution::RoughnessToAlpha(roughu);
+                roughv = TrowbridgeReitzDistribution::RoughnessToAlpha(roughv);
+            }
+            MicrofacetDistribution *distrib =
+                    ARENA_ALLOC(arena, TrowbridgeReitzDistribution)(roughu, roughv);
+            si->bsdf->Add(ARENA_ALLOC(arena, FresnelBlend)(diffuse, specular, distrib));
+        }
 
         // 3d cylinder (with rotation angle?)
 
@@ -65,7 +73,22 @@ namespace pbrt {
     }
 
     SolidWoodMaterial *CreateSolidWoodMaterial(const TextureParams &mp) {
-        return new SolidWoodMaterial();
+        Float scale = mp.FindFloat("scale", 1);
+        float color1array[] = {0.729, 0.243, 0.070};
+        float color2array[] = {0.2716, 0.096, 0.03};
+        Spectrum color1 = mp.FindSpectrum("color1", RGBSpectrum::FromRGB(color1array));
+        Spectrum color2 = mp.FindSpectrum("color2", RGBSpectrum::FromRGB(color2array));
+        std::shared_ptr<Texture<Spectrum>> Ks =
+                                                   mp.GetSpectrumTexture("Ks", Spectrum(.5f));
+        std::shared_ptr<Texture<Float>> uroughness =
+                                                mp.GetFloatTexture("uroughness", .1f);
+        std::shared_ptr<Texture<Float>> vroughness =
+                                                mp.GetFloatTexture("vroughness", .1f);
+        std::shared_ptr<Texture<Float>> bumpMap =
+                                                mp.GetFloatTextureOrNull("bumpmap");
+        bool remapRoughness = mp.FindBool("remaproughness", true);
+        return new SolidWoodMaterial(scale, color1, color2, Ks, uroughness, vroughness, bumpMap,
+                                     remapRoughness);
     }
 
 }

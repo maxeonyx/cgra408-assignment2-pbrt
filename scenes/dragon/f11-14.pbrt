@@ -1,0 +1,53 @@
+
+Film "image" "integer xresolution" [1200] "integer yresolution" [720] "float scale" 3
+  "string filename" "f11-14.exr"  #  "float maxsampleluminance" 10
+
+Integrator "mlt" "integer mutationsperpixel" 12000
+#Integrator "mlt" "integer mutationsperpixel" 128
+
+Sampler "sobol" "integer pixelsamples" 8192
+Integrator "bdpt"
+
+LookAt 500 -100 300 0 100 -60  0 0 1
+Camera "perspective" "float fov" [32]
+
+WorldBegin
+
+AttributeBegin
+Rotate 90 0 0 1
+Rotate -90 1 0 0
+LightSource "infinite" "string mapname"
+    "textures/20060807_wells6_hd.exr"   "color scale" [2.5 2.5 2.5]
+AttributeEnd
+
+AttributeBegin
+Material "matte" "color Kd" [.1 .1 .1]
+Translate 0 0 -40
+Shape "trianglemesh"
+   "point P" [ -1000 -1000 0   1000 -1000 0   1000 1000 0 -1000 1000 0 ]
+   "float uv" [ 0 0 1 0 1 1 0 1 ]
+	"integer indices" [ 0 1 2 2 3 0]
+AttributeEnd
+
+MakeNamedMedium "medium" "string type" "homogeneous"
+"color sigma_a" [ .03 .03 .03 ] "color sigma_s" [ .05 .05 .05 ]
+ "float g" 0
+
+
+AttributeBegin
+Translate -60 -60 0
+Rotate -53 0 1 0
+MediumInterface "medium" ""
+Material ""
+Shape "plymesh" "string filename" "geometry/dragon_remeshed.ply"
+AttributeEnd
+
+AttributeBegin
+Translate 110 110 0
+Rotate -53 0 1 0
+MediumInterface "medium" ""
+Material "glass" 
+Shape "plymesh" "string filename" "geometry/dragon_remeshed.ply"
+AttributeEnd
+
+WorldEnd

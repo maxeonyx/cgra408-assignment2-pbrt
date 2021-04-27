@@ -1,4 +1,4 @@
-LookAt   0 -10 20   0 0 0   0 0 1
+LookAt   0 -13 10   0 0 1.5   0 0 1
 
 Camera "perspective" "float fov" [39]
 Film "image"  
@@ -23,12 +23,12 @@ AttributeBegin
     Rotate -60 0 0 1
     LightSource "infinite" 
             "string mapname" [ "textures/skylight-day.exr" ] 
-            "rgb scale" [ 1.5000000000 1.5000000000 1.3999999762 ] 
+            "rgb scale" [ 1. 1. 1. ]
 AttributeEnd
 
 # Tiny Planet
 AttributeBegin
-    Material "matte" "color Kd" [.5 .5 .8]
+    Material "matte" "color Kd" [.5 .5 .5]
     Translate 0 0 -500
     Shape "sphere" "float radius" [500]
 AttributeEnd
@@ -36,6 +36,10 @@ AttributeEnd
 # Dome
 AttributeBegin
     Material "wood"
+        "float scale" 1
+        "float uroughness" [ 0.1 ]
+        "float vroughness" [ 0.1 ]
+        "rgb Ks" [ 0.2 0.2 0.2 ]
     Translate 0 0 3
     Shape "sphere" "float radius" [3]
 AttributeEnd
