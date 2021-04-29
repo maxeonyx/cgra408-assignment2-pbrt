@@ -2,6 +2,7 @@
 #include <core/spectrum.h>
 #include "pbrt.h"
 #include "material.h"
+#include "FastNoiseLite.h"
 
 namespace pbrt {
 
@@ -26,13 +27,17 @@ class SolidWoodMaterial : public Material {
            nv(nv),
            bumpMap(bumpMap),
            remapRoughness(remapRoughness)
-          {}
+          {
+          }
 
+    virtual Float SolidWoodValAt(Point3f p) const;
+    virtual void WoodBump(
+                          SurfaceInteraction *si) const;
 
     void ComputeScatteringFunctions(SurfaceInteraction *si,
                                             MemoryArena &arena,
                                             TransportMode mode,
-                                            bool allowMultipleLobes) const;
+                                            bool allowMultipleLobes) const override;
 private:
     Float scale;
     Spectrum color1, color2;
