@@ -54,13 +54,14 @@ namespace pbrt {
 
     Float SolidWoodMaterial::SolidWoodValAt(Point3f p) const {
 
-        FastNoiseLite n = FastNoiseLite();
+        FastNoiseLite n1 = FastNoiseLite(45388);
+        FastNoiseLite n2 = FastNoiseLite(1886438);
 
-        double val1 = n.GetNoise(p.x*100,p.y*100,p.z*10)*0.5 + 0.5;
-        double val2 = n.GetNoise(p.x*100 + 11,p.y*100 + 11,p.z*10 + 11)*0.5 + 0.5;
+        double val1 = n1.GetNoise(p.x*100,p.y*100,p.z*10)*0.5 + 0.5;
+        double val2 = n2.GetNoise(p.x*100,p.y*100,p.z*10)*0.5 + 0.5;
         double warp_x = p.x+val1*0.3;
         double warp_y = p.y+val2*0.3;
-        double warp_dist = std::sqrt(warp_x*warp_x + warp_y*warp_y);
+        double warp_dist = std::sqrt(warp_x*warp_x + warp_y*warp_y) * scale;
         double big_dist = warp_dist * 10;
         double fine_dist = warp_dist * 60;
         double small_rings = std::sin(fine_dist) * 0.5 + 0.5;
@@ -80,7 +81,7 @@ namespace pbrt {
 
         WoodBump(si);
 
-        Point3f p = si->p * (1/scale);
+        Point3f p = si->p;
 
         double val = SolidWoodValAt(p);
 

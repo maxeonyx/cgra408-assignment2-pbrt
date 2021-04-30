@@ -36,14 +36,14 @@ AttributeEnd
 # Dome
 AttributeBegin
     Material "wood"
-        "float scale" 6.50
-        "float small_ring_scale" 105.10
-        "float small_large_mix" 0.60
-        "float warpiness" 0.70
+        "float scale" $SCALE$
+        "float small_ring_scale" $SMALL_RING_SCALE$
+        "float small_large_mix" $SMALL_LARGE_MIX$
+        "float warpiness" $WARPINESS$
         "float uroughness" [ 0.1 ]
         "float vroughness" [ 0.1 ]
-        "rgb color1" [ 0.16 0.04 0.01 ]
-        "rgb color2" [ 0.72 0.30 0.08 ]
+        "rgb color1" [ $COLOR1_R$ $COLOR1_G$ $COLOR1_B$ ]
+        "rgb color2" [ $COLOR2_R$ $COLOR2_G$ $COLOR2_B$ ]
         "rgb Ks" [ 0.2 0.2 0.2 ]
     Translate 0 0 3
     Shape "sphere" "float radius" [3]
