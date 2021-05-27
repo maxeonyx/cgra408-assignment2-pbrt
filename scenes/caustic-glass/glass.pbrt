@@ -9,7 +9,7 @@ Film "image"
         "float scale" [ 1.5000000000 ] 
         "string filename" "glass.exr"
 
-Sampler "sobol" "integer pixelsamples" 30
+Sampler "sobol" "integer pixelsamples" 4
 Integrator "bdpt" "integer maxdepth" 20
 
 #############################################

@@ -31,8 +31,8 @@
  */
 
 
-// materials/glass.cpp*
-#include "materials/glass.h"
+// materials/portalcrystal.cpp*
+#include "materials/portalcrystal.h"
 #include "spectrum.h"
 #include "reflection.h"
 #include "paramset.h"
@@ -42,11 +42,12 @@
 namespace pbrt {
 
 // GlassMaterial Method Definitions
-void GlassMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
+void PortalCrystalMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
                                                MemoryArena &arena,
                                                TransportMode mode,
                                                bool allowMultipleLobes) const {
-
+    // Perform bump mapping with _bumpMap_, if present
+    if (bumpMap) Bump(bumpMap, si);
     Float eta = index->Evaluate(*si);
     Float urough = uRoughness->Evaluate(*si);
     Float vrough = vRoughness->Evaluate(*si);
@@ -90,7 +91,7 @@ void GlassMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
     }
 }
 
-GlassMaterial *CreateGlassMaterial(const TextureParams &mp) {
+PortalCrystalMaterial *CreatePortalCrystalMaterial(const TextureParams &mp) {
     std::shared_ptr<Texture<Spectrum>> Kr =
         mp.GetSpectrumTexture("Kr", Spectrum(1.f));
     std::shared_ptr<Texture<Spectrum>> Kt =
@@ -104,7 +105,7 @@ GlassMaterial *CreateGlassMaterial(const TextureParams &mp) {
     std::shared_ptr<Texture<Float>> bumpMap =
         mp.GetFloatTextureOrNull("bumpmap");
     bool remapRoughness = mp.FindBool("remaproughness", true);
-    return new GlassMaterial(Kr, Kt, roughu, roughv, eta, bumpMap,
+    return new PortalCrystalMaterial(Kr, Kt, roughu, roughv, eta, bumpMap,
                              remapRoughness);
 }
 

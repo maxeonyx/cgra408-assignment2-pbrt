@@ -7,7 +7,7 @@ Film "image"
         "integer yresolution" [ 1000 ] 
         "string filename" [ "f16-22a.exr" ] 
 Sampler "02sequence" 
-        "integer pixelsamples" [ 512 ] 
+        "integer pixelsamples" [ 8 ] 
 Integrator "bdpt" 
 MediumInterface "" "vol"
 LookAt -0.75 0.800000012 -1.25

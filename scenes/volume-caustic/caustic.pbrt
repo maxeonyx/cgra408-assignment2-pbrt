@@ -7,7 +7,7 @@ Film "image"
         "integer yresolution" [ 800 ] 
         "string filename" [ "caustic.exr" ] 
 Integrator "mlt" 
-        "integer mutationsperpixel" [ 128 ] 
+        "integer mutationsperpixel" [ 1 ] 
 MediumInterface "" "vol"
 LookAt -0.75 0.800000012 -1.25
         -1 0.800000012 0

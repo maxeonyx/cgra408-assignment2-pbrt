@@ -70,6 +70,7 @@
 #include "materials/disney.h"
 #include "materials/fourier.h"
 #include "materials/glass.h"
+#include "materials/portalcrystal.h"
 #include "materials/hair.h"
 #include "materials/kdsubsurface.h"
 #include "materials/matte.h"
@@ -550,6 +551,8 @@ std::shared_ptr<Material> MakeMaterial(const std::string &name,
         material = CreateTranslucentMaterial(mp);
     else if (name == "glass")
         material = CreateGlassMaterial(mp);
+    else if (name == "portalcrystal")
+        material = CreatePortalCrystalMaterial(mp);
     else if (name == "mirror")
         material = CreateMirrorMaterial(mp);
     else if (name == "hair")
