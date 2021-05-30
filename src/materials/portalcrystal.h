@@ -39,6 +39,8 @@
 #define PBRT_MATERIALS_PORTALCRYSTAL_H
 
 // materials/portalcrystal.h*
+#include <utility>
+
 #include "pbrt.h"
 #include "material.h"
 
@@ -48,31 +50,24 @@ namespace pbrt {
 class PortalCrystalMaterial : public Material {
   public:
     // PortalCrystalMaterial Public Methods
-    PortalCrystalMaterial(const std::shared_ptr<Texture<Spectrum>> &Kr,
-                  const std::shared_ptr<Texture<Spectrum>> &Kt,
-                  const std::shared_ptr<Texture<Float>> &uRoughness,
-                  const std::shared_ptr<Texture<Float>> &vRoughness,
-                  const std::shared_ptr<Texture<Float>> &index,
-                  const std::shared_ptr<Texture<Float>> &bumpMap,
-                  bool remapRoughness)
-        : Kr(Kr),
-          Kt(Kt),
-          uRoughness(uRoughness),
-          vRoughness(vRoughness),
-          index(index),
-          bumpMap(bumpMap),
-          remapRoughness(remapRoughness) {}
+    PortalCrystalMaterial(std::shared_ptr<Texture<Spectrum>> Kr,
+                  std::shared_ptr<Texture<Spectrum>> Kt,
+                  std::shared_ptr<Texture<Float>> index,
+                  Float attenuation_length)
+        : Kr(std::move(Kr)),
+          Kt(std::move(Kt)),
+          index(std::move(index)),
+          attenuation_length(attenuation_length) {}
     void ComputeScatteringFunctions(SurfaceInteraction *si, MemoryArena &arena,
                                     TransportMode mode,
-                                    bool allowMultipleLobes) const;
-
+                                    bool allowMultipleLobes) const override;
+    bool IsAbsorby() const override { return true; }
+    Spectrum Absorb(float d, const Spectrum &spectrum) const override;
   private:
     // GlassMaterial Private Data
     std::shared_ptr<Texture<Spectrum>> Kr, Kt;
-    std::shared_ptr<Texture<Float>> uRoughness, vRoughness;
     std::shared_ptr<Texture<Float>> index;
-    std::shared_ptr<Texture<Float>> bumpMap;
-    bool remapRoughness;
+    Float attenuation_length;
 };
 
 PortalCrystalMaterial *CreatePortalCrystalMaterial(const TextureParams &mp);

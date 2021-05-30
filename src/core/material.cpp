@@ -82,4 +82,5 @@ void Material::Bump(const std::shared_ptr<Texture<Float>> &d,
                            false);
 }
 
+
 }  // namespace pbrt

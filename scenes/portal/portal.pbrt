@@ -1,0 +1,51 @@
+LookAt   0 -20 5   0 0 3   0 0 1
+
+Camera "perspective" "float fov" [39]
+Film "image"
+    "integer xresolution" [700] "integer yresolution" [700]
+    "string filename" "portal.exr"
+
+Sampler "halton" "integer pixelsamples" [50]
+
+Integrator "path"
+
+WorldBegin
+
+#sky
+AttributeBegin
+    Rotate -60 0 0 1
+    LightSource "infinite"
+            "string mapname" [ "textures/doge2_latlong.exr" ]
+            "rgb scale" [ 1. 1. 1. ]
+AttributeEnd
+
+# Glass Sphere
+#AttributeBegin
+#    Material "glass"
+#    Translate 0 0 3
+#    Shape "sphere" "float radius" [3]
+#AttributeEnd
+
+# KdSubsurface Sphere
+#AttributeBegin
+#    Material "kdsubsurface" "float scale" [10]
+#    Translate 0 0 3
+#    Shape "sphere" "float radius" [3]
+#AttributeEnd
+
+# PortalCrystal small absorptive Sphere
+AttributeBegin
+    Material "portalcrystal" "float index" [1.77] "float attenuation_length" [1]
+    Translate -3.5 0 3
+    Shape "sphere" "float radius" [3]
+AttributeEnd
+
+# PortalCrystal large absorptive Sphere
+AttributeBegin
+    Material "portalcrystal" "float index" [1.77] "float attenuation_length" [1]
+    Translate 3.5 0 3
+    Shape "sphere" "float radius" [1]
+AttributeEnd
+
+
+WorldEnd

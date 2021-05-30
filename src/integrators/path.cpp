@@ -133,6 +133,16 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         BxDFType flags;
         Spectrum f = isect.bsdf->Sample_f(wo, &wi, sampler.Get2D(), &pdf,
                                           BSDF_ALL, &flags);
+        if (isect.primitive->GetMaterial()->IsAbsorby()) {
+            Ray depthRay = isect.SpawnRay(wi);
+            SurfaceInteraction depthSi;
+            bool foundDepthIsect = scene.Intersect(depthRay, &depthSi);
+            if (foundDepthIsect) {
+                Vector3f lengthInMedium = isect.p - depthSi.p;
+                float d = lengthInMedium.Length();
+                f = isect.primitive->GetMaterial()->Absorb(d, f);
+            }
+        }
         VLOG(2) << "Sampled BSDF, f = " << f << ", pdf = " << pdf;
         if (f.IsBlack() || pdf == 0.f) break;
         beta *= f * AbsDot(wi, isect.shading.n) / pdf;
@@ -148,6 +158,12 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
             etaScale *= (Dot(wo, isect.n) > 0) ? (eta * eta) : 1 / (eta * eta);
         }
         ray = isect.SpawnRay(wi);
+
+        // teleport ray with some probability if this material is the light portal material and the interaction is on
+        // the emissive crystal (because we are doing from-camera path tracing)
+        if (false/* teleport ray */) {
+
+        }
 
         // Account for subsurface scattering, if applicable
         if (isect.bssrdf && (flags & BSDF_TRANSMISSION)) {

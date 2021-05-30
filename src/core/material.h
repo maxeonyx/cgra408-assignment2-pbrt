@@ -41,6 +41,7 @@
 // core/material.h*
 #include "pbrt.h"
 #include "memory.h"
+#include "spectrum.h"
 
 namespace pbrt {
 
@@ -55,9 +56,12 @@ class Material {
                                             MemoryArena &arena,
                                             TransportMode mode,
                                             bool allowMultipleLobes) const = 0;
+    virtual bool IsAbsorby() const { return false; };
     virtual ~Material();
     static void Bump(const std::shared_ptr<Texture<Float>> &d,
                      SurfaceInteraction *si);
+
+    virtual Spectrum Absorb(float d, const Spectrum &spectrum) const { return spectrum; };
 };
 
 }  // namespace pbrt

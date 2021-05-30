@@ -70,7 +70,6 @@
 #include "materials/disney.h"
 #include "materials/fourier.h"
 #include "materials/glass.h"
-#include "materials/portalcrystal.h"
 #include "materials/hair.h"
 #include "materials/kdsubsurface.h"
 #include "materials/matte.h"
@@ -119,6 +118,7 @@
 #include <map>
 #include <stdio.h>
 #include <materials/wood.h>
+#include <materials/portalcrystal.h>
 
 namespace pbrt {
 
