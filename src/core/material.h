@@ -42,6 +42,7 @@
 #include "pbrt.h"
 #include "memory.h"
 #include "spectrum.h"
+#include "transform.h"
 
 namespace pbrt {
 
@@ -56,10 +57,11 @@ class Material {
                                             MemoryArena &arena,
                                             TransportMode mode,
                                             bool allowMultipleLobes) const = 0;
-    virtual bool IsAbsorby(const SurfaceInteraction *si) const { return false; };
     virtual bool IsPortal() const { return false; };
-    virtual bool IsEmitty(const SurfaceInteraction *si) const { return false; };
-    virtual void AddShape(const std::shared_ptr<Shape> shape) {};
+    // Add the world to object transform for the absorber object.
+    virtual void AddAbsorberTransform(const Transform t) {};
+    // Add the world to object transform for the emitter object.
+    virtual void AddEmitterTransform(const Transform t) {};
     virtual void CameraFirstTransform(RayDifferential *ray) const {};
     virtual void LightFirstTransform(RayDifferential *ray) const {};
     virtual ~Material();

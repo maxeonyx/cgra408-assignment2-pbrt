@@ -1027,6 +1027,10 @@ static void parse(std::unique_ptr<Tokenizer> t) {
         case 'S':
             if (tok == "Shape")
                 basicParamListEntrypoint(SpectrumType::Reflectance, pbrtShape);
+            else if (tok == "SetEmitter")
+                pbrtSetEmitterPortal();
+            else if (tok == "SetAbsorber")
+                pbrtSetAbsorberPortal();
             else if (tok == "Sampler")
                 basicParamListEntrypoint(SpectrumType::Reflectance,
                                          pbrtSampler);

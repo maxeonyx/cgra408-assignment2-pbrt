@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="pbrt (portal)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="scenes/portal/portal.pbrt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PBRT-V3" TARGET_NAME="pbrt" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="PBRT-V3" RUN_TARGET_NAME="pbrt_exe">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

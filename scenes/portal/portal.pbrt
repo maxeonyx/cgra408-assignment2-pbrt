@@ -22,14 +22,12 @@ AttributeEnd
 # PortalCrystal large absorptive Sphere
 AttributeBegin
     Material "portalcrystal" "float index" [1.001] "float attenuation_length" [3]
-    AttributeBegin
-        Translate 3.5 0 3
-        Shape "sphere" "float radius" [3]
-    AttributeEnd
-    AttributeBegin
-        Translate -3.5 0 3
-        Shape "sphere" "float radius" [3]
-    AttributeEnd
+    Translate 3.5 0 3
+    SetAbsorber
+    Shape "sphere" "float radius" [3]
+    Translate -7 0 0
+    SetEmitter
+    Shape "sphere" "float radius" [3]
 AttributeEnd
 
 

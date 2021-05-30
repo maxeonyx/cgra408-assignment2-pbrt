@@ -133,16 +133,6 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         BxDFType flags;
         Spectrum f = isect.bsdf->Sample_f(wo, &wi, sampler.Get2D(), &pdf,
                                           BSDF_ALL, &flags);
-        if (isect.primitive->GetMaterial()->IsAbsorby(&isect)) {
-            Ray depthRay = isect.SpawnRay(wi);
-            SurfaceInteraction depthSi;
-            bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
-            if (foundDepthIntersect) {
-                Vector3f lengthInMedium = isect.p - depthSi.p;
-                float d = lengthInMedium.Length();
-                f *= isect.primitive->GetMaterial()->Attenuation(d);
-            }
-        }
         VLOG(2) << "Sampled BSDF, f = " << f << ", pdf = " << pdf;
         if (f.IsBlack() || pdf == 0.f) break;
         beta *= f * AbsDot(wi, isect.shading.n) / pdf;
@@ -159,22 +149,31 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         }
         ray = isect.SpawnRay(wi);
 
-
-        if (isect.primitive->GetMaterial()->IsEmitty(&isect)) {
-            float u = sampler.Get1D();
-            // randomly choose whether this ray came from the other side of the
-            // crystal, or from the magical emission
-            if (u < 0.5) {
-                // transform the current ray
-                ray.d.z = ray.d.z * -1;
-                // calculate the reduction in radiance due to the ray only being partially absorbed
-                Ray depthRay = isect.SpawnRay(wi);
+        if (isect.primitive->GetMaterial()->IsPortal()) {
+            if (isect.shape->absorby) {
                 SurfaceInteraction depthSi;
-                bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
+                bool foundDepthIntersect = scene.Intersect(ray, &depthSi);
                 if (foundDepthIntersect) {
                     Vector3f lengthInMedium = isect.p - depthSi.p;
                     float d = lengthInMedium.Length();
-                    f += 1 - isect.primitive->GetMaterial()->Attenuation(d);
+                    beta *= isect.primitive->GetMaterial()->Attenuation(d);
+                }
+            } else {
+                float u = sampler.Get1D();
+                float magical_probability = 0.5; // probability of trying to sample the magical transmission
+                // randomly choose whether this ray came from the other side of the
+                // crystal, or from the magical emission
+                if (u < magical_probability) {
+                    SurfaceInteraction depthSi;
+                    bool foundDepthIntersect = scene.Intersect(ray, &depthSi);
+                    if (foundDepthIntersect) {
+                        Vector3f lengthInMedium = isect.p - depthSi.p;
+                        float d = lengthInMedium.Length();
+                        // transform the current ray
+                        ray.d.z = ray.d.z * -1;
+                        //beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
+                        beta /= magical_probability;
+                    }
                 }
             }
         }

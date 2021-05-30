@@ -82,10 +82,13 @@ class Shape {
     // used in this case.
     virtual Float SolidAngle(const Point3f &p, int nSamples = 512) const;
 
+    virtual void SetAbsorby(const bool a) { absorby = a; };
+
     // Shape Public Data
     const Transform *ObjectToWorld, *WorldToObject;
     const bool reverseOrientation;
     const bool transformSwapsHandedness;
+    bool absorby = true;
 };
 
 }  // namespace pbrt

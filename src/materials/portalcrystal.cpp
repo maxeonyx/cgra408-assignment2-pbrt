@@ -39,6 +39,7 @@
 #include "paramset.h"
 #include "texture.h"
 #include "interaction.h"
+#include "transform.h"
 
 namespace pbrt {
 
@@ -71,37 +72,28 @@ namespace pbrt {
 
     }
 
-    void PortalCrystalMaterial::AddShape(const std::shared_ptr<Shape> shape) {
-        if (shape1 == nullptr) {
-            shape1 = shape;
-        }
-        else if (shape2 == nullptr) {
-            shape2 = shape;
-        }
-    }
-
-    bool PortalCrystalMaterial::IsAbsorby(const SurfaceInteraction *si) const {
-        return si->shape == shape1.get();
-    }
-
-    bool PortalCrystalMaterial::IsEmitty(const SurfaceInteraction *si) const {
-        return si->shape == shape2.get();
-    }
-
     float PortalCrystalMaterial::Attenuation(float d) const {
         return exp(-d / attenuation_length);
     }
 
     void PortalCrystalMaterial::CameraFirstTransform(RayDifferential *ray) const {
-        Ray worldRay = (*shape2->ObjectToWorld)(*ray);
-        Ray destRay = (*shape1->WorldToObject)(worldRay);
+        RayDifferential worldRay = Inverse(emitterTransform)(*ray);
+        RayDifferential destRay = absorberTransform(worldRay);
         *ray = destRay;
     }
 
     void PortalCrystalMaterial::LightFirstTransform(RayDifferential *ray) const {
-        Ray worldRay = (*shape1->ObjectToWorld)(*ray);
-        Ray destRay = (*shape2->WorldToObject)(worldRay);
+        RayDifferential worldRay = Inverse(absorberTransform)(*ray);
+        RayDifferential destRay = emitterTransform(worldRay);
         *ray = destRay;
+    }
+
+    void PortalCrystalMaterial::AddAbsorberTransform(const Transform t) {
+        absorberTransform = t;
+    }
+
+    void PortalCrystalMaterial::AddEmitterTransform(const Transform t) {
+        emitterTransform = t;
     }
 
     PortalCrystalMaterial *CreatePortalCrystalMaterial(const TextureParams &mp) {

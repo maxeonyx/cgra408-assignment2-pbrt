@@ -239,6 +239,8 @@ struct GraphicsState {
     ParamSet areaLightParams;
     std::string areaLight;
     bool reverseOrientation = false;
+
+    bool absorby = true;
 };
 
 STAT_MEMORY_COUNTER("Memory/TransformCache", transformCacheBytes);
@@ -1332,6 +1334,22 @@ void pbrtAreaLightSource(const std::string &name, const ParamSet &params) {
     }
 }
 
+void pbrtSetAbsorberPortal() {
+    CHECK(graphicsState.currentMaterial);
+    CHECK(graphicsState.currentMaterial->material->IsPortal());
+    graphicsState.absorby = true;
+    Transform *WorldToObj = transformCache.Lookup(Inverse(curTransform[0]));
+    graphicsState.currentMaterial->material->AddAbsorberTransform(*WorldToObj);
+}
+
+void pbrtSetEmitterPortal() {
+    CHECK(graphicsState.currentMaterial);
+    CHECK(graphicsState.currentMaterial->material->IsPortal());
+    graphicsState.absorby = false;
+    Transform *WorldToObj = transformCache.Lookup(Inverse(curTransform[0]));
+    graphicsState.currentMaterial->material->AddEmitterTransform(*WorldToObj);
+}
+
 void pbrtShape(const std::string &name, const ParamSet &params) {
     VERIFY_WORLD("Shape");
     std::vector<std::shared_ptr<Primitive>> prims;
@@ -1353,17 +1371,11 @@ void pbrtShape(const std::string &name, const ParamSet &params) {
                        graphicsState.reverseOrientation, params);
         if (shapes.empty()) return;
         std::shared_ptr<Material> mtl = graphicsState.GetMaterialForShape(params);
-        if (mtl->IsPortal()) {
-            if (shapes.size() != 2) {
-                Error("Portal material must be in a block with exactly 2 shapes.");
-            }
-            mtl->AddShape(shapes[0]);
-            mtl->AddShape(shapes[1]);
-        }
         params.ReportUnused();
         MediumInterface mi = graphicsState.CreateMediumInterface();
         prims.reserve(shapes.size());
         for (auto s : shapes) {
+            s->SetAbsorby(graphicsState.absorby);
             // Possibly create area light for shape
             std::shared_ptr<AreaLight> area;
             if (graphicsState.areaLight != "") {

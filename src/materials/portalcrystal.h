@@ -62,15 +62,14 @@ class PortalCrystalMaterial : public Material {
                                     TransportMode mode,
                                     bool allowMultipleLobes) const override;
     bool IsPortal() const override { return true; }
-    bool IsAbsorby(const SurfaceInteraction *si) const override;
-    bool IsEmitty(const SurfaceInteraction *si) const override;
-    void AddShape(std::shared_ptr<Shape> shape) override;
+    void AddAbsorberTransform(const Transform t) override;
+    void AddEmitterTransform(const Transform t) override;
     float Attenuation(float d) const override;
     void CameraFirstTransform(RayDifferential *ray) const override;
     void LightFirstTransform(RayDifferential *ray) const override;
   private:
-    std::shared_ptr<Shape> shape1 = nullptr;
-    std::shared_ptr<Shape> shape2 = nullptr;
+    Transform emitterTransform = Transform();
+    Transform absorberTransform = Transform();
     // GlassMaterial Private Data
     std::shared_ptr<Texture<Spectrum>> Kr, Kt;
     std::shared_ptr<Texture<Float>> index;
