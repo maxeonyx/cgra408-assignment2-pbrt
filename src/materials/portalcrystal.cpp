@@ -71,8 +71,8 @@ namespace pbrt {
 
     }
 
-    Spectrum PortalCrystalMaterial::Absorb(float d, const Spectrum &spectrum) const {
-        return spectrum * exp(-d / attenuation_length);
+    float PortalCrystalMaterial::Attenuation(float d) const {
+        return exp(-d / attenuation_length);
     }
 
     PortalCrystalMaterial *CreatePortalCrystalMaterial(const TextureParams &mp) {

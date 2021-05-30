@@ -136,11 +136,29 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         if (isect.primitive->GetMaterial()->IsAbsorby()) {
             Ray depthRay = isect.SpawnRay(wi);
             SurfaceInteraction depthSi;
-            bool foundDepthIsect = scene.Intersect(depthRay, &depthSi);
-            if (foundDepthIsect) {
+            bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
+            if (foundDepthIntersect) {
                 Vector3f lengthInMedium = isect.p - depthSi.p;
                 float d = lengthInMedium.Length();
-                f = isect.primitive->GetMaterial()->Absorb(d, f);
+                f *= isect.primitive->GetMaterial()->Attenuation(d);
+            }
+        }
+        if (isect.primitive->GetMaterial()->IsEmitty()) {
+            float u = sampler.Get1D();
+            // randomly choose whether this ray came from the other side of the
+            // crystal, or from the magical emission
+            if (u < 0.5) {
+                // transform the current ray
+                isect.primitive->GetMaterial()->CameraFirstTransform(ray);
+                // calculate the reduction in radiance due to the ray only being partially absorbed
+                Ray depthRay = isect.SpawnRay(wi);
+                SurfaceInteraction depthSi;
+                bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
+                if (foundDepthIntersect) {
+                    Vector3f lengthInMedium = isect.p - depthSi.p;
+                    float d = lengthInMedium.Length();
+                    f *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
+                }
             }
         }
         VLOG(2) << "Sampled BSDF, f = " << f << ", pdf = " << pdf;

@@ -57,11 +57,14 @@ class Material {
                                             TransportMode mode,
                                             bool allowMultipleLobes) const = 0;
     virtual bool IsAbsorby() const { return false; };
+    virtual bool IsEmitty() const { return false; };
+    virtual void CameraFirstTransform(Ray &ray) const {};
+    virtual void LightFirstTransform(Ray &ray) const {};
     virtual ~Material();
     static void Bump(const std::shared_ptr<Texture<Float>> &d,
                      SurfaceInteraction *si);
 
-    virtual Spectrum Absorb(float d, const Spectrum &spectrum) const { return spectrum; };
+    virtual float Attenuation(float d) const { return 1; };
 };
 
 }  // namespace pbrt

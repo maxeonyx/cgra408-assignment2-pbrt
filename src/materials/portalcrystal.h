@@ -62,7 +62,7 @@ class PortalCrystalMaterial : public Material {
                                     TransportMode mode,
                                     bool allowMultipleLobes) const override;
     bool IsAbsorby() const override { return true; }
-    Spectrum Absorb(float d, const Spectrum &spectrum) const override;
+    float Attenuation(float d) const override;
   private:
     // GlassMaterial Private Data
     std::shared_ptr<Texture<Spectrum>> Kr, Kt;
