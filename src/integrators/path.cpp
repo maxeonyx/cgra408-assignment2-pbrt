@@ -133,7 +133,7 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         BxDFType flags;
         Spectrum f = isect.bsdf->Sample_f(wo, &wi, sampler.Get2D(), &pdf,
                                           BSDF_ALL, &flags);
-        if (isect.primitive->GetMaterial()->IsAbsorby()) {
+        if (isect.primitive->GetMaterial()->IsAbsorby(&isect)) {
             Ray depthRay = isect.SpawnRay(wi);
             SurfaceInteraction depthSi;
             bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
@@ -141,24 +141,6 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
                 Vector3f lengthInMedium = isect.p - depthSi.p;
                 float d = lengthInMedium.Length();
                 f *= isect.primitive->GetMaterial()->Attenuation(d);
-            }
-        }
-        if (isect.primitive->GetMaterial()->IsEmitty()) {
-            float u = sampler.Get1D();
-            // randomly choose whether this ray came from the other side of the
-            // crystal, or from the magical emission
-            if (u < 0.5) {
-                // transform the current ray
-                isect.primitive->GetMaterial()->CameraFirstTransform(ray);
-                // calculate the reduction in radiance due to the ray only being partially absorbed
-                Ray depthRay = isect.SpawnRay(wi);
-                SurfaceInteraction depthSi;
-                bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
-                if (foundDepthIntersect) {
-                    Vector3f lengthInMedium = isect.p - depthSi.p;
-                    float d = lengthInMedium.Length();
-                    f *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
-                }
             }
         }
         VLOG(2) << "Sampled BSDF, f = " << f << ", pdf = " << pdf;
@@ -177,10 +159,24 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         }
         ray = isect.SpawnRay(wi);
 
-        // teleport ray with some probability if this material is the light portal material and the interaction is on
-        // the emissive crystal (because we are doing from-camera path tracing)
-        if (false/* teleport ray */) {
 
+        if (isect.primitive->GetMaterial()->IsEmitty(&isect)) {
+            float u = sampler.Get1D();
+            // randomly choose whether this ray came from the other side of the
+            // crystal, or from the magical emission
+            if (u < 0.5) {
+                // transform the current ray
+                ray.d.z = ray.d.z * -1;
+                // calculate the reduction in radiance due to the ray only being partially absorbed
+                Ray depthRay = isect.SpawnRay(wi);
+                SurfaceInteraction depthSi;
+                bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
+                if (foundDepthIntersect) {
+                    Vector3f lengthInMedium = isect.p - depthSi.p;
+                    float d = lengthInMedium.Length();
+                    f += 1 - isect.primitive->GetMaterial()->Attenuation(d);
+                }
+            }
         }
 
         // Account for subsurface scattering, if applicable

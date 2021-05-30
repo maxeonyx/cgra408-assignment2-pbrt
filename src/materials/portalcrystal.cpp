@@ -71,8 +71,37 @@ namespace pbrt {
 
     }
 
+    void PortalCrystalMaterial::AddShape(const std::shared_ptr<Shape> shape) {
+        if (shape1 == nullptr) {
+            shape1 = shape;
+        }
+        else if (shape2 == nullptr) {
+            shape2 = shape;
+        }
+    }
+
+    bool PortalCrystalMaterial::IsAbsorby(const SurfaceInteraction *si) const {
+        return si->shape == shape1.get();
+    }
+
+    bool PortalCrystalMaterial::IsEmitty(const SurfaceInteraction *si) const {
+        return si->shape == shape2.get();
+    }
+
     float PortalCrystalMaterial::Attenuation(float d) const {
         return exp(-d / attenuation_length);
+    }
+
+    void PortalCrystalMaterial::CameraFirstTransform(RayDifferential *ray) const {
+        Ray worldRay = (*shape2->ObjectToWorld)(*ray);
+        Ray destRay = (*shape1->WorldToObject)(worldRay);
+        *ray = destRay;
+    }
+
+    void PortalCrystalMaterial::LightFirstTransform(RayDifferential *ray) const {
+        Ray worldRay = (*shape1->ObjectToWorld)(*ray);
+        Ray destRay = (*shape2->WorldToObject)(worldRay);
+        *ray = destRay;
     }
 
     PortalCrystalMaterial *CreatePortalCrystalMaterial(const TextureParams &mp) {

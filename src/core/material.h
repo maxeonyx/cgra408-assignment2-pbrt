@@ -56,10 +56,12 @@ class Material {
                                             MemoryArena &arena,
                                             TransportMode mode,
                                             bool allowMultipleLobes) const = 0;
-    virtual bool IsAbsorby() const { return false; };
-    virtual bool IsEmitty() const { return false; };
-    virtual void CameraFirstTransform(Ray &ray) const {};
-    virtual void LightFirstTransform(Ray &ray) const {};
+    virtual bool IsAbsorby(const SurfaceInteraction *si) const { return false; };
+    virtual bool IsPortal() const { return false; };
+    virtual bool IsEmitty(const SurfaceInteraction *si) const { return false; };
+    virtual void AddShape(const std::shared_ptr<Shape> shape) {};
+    virtual void CameraFirstTransform(RayDifferential *ray) const {};
+    virtual void LightFirstTransform(RayDifferential *ray) const {};
     virtual ~Material();
     static void Bump(const std::shared_ptr<Texture<Float>> &d,
                      SurfaceInteraction *si);

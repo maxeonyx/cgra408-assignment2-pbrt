@@ -1353,6 +1353,13 @@ void pbrtShape(const std::string &name, const ParamSet &params) {
                        graphicsState.reverseOrientation, params);
         if (shapes.empty()) return;
         std::shared_ptr<Material> mtl = graphicsState.GetMaterialForShape(params);
+        if (mtl->IsPortal()) {
+            if (shapes.size() != 2) {
+                Error("Portal material must be in a block with exactly 2 shapes.");
+            }
+            mtl->AddShape(shapes[0]);
+            mtl->AddShape(shapes[1]);
+        }
         params.ReportUnused();
         MediumInterface mi = graphicsState.CreateMediumInterface();
         prims.reserve(shapes.size());
@@ -1382,6 +1389,8 @@ void pbrtShape(const std::string &name, const ParamSet &params) {
 
         // Create _GeometricPrimitive_(s) for animated shape
         std::shared_ptr<Material> mtl = graphicsState.GetMaterialForShape(params);
+
+
         params.ReportUnused();
         MediumInterface mi = graphicsState.CreateMediumInterface();
         prims.reserve(shapes.size());
