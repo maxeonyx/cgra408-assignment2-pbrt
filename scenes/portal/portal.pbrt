@@ -26,6 +26,7 @@ AttributeBegin
     SetAbsorber
     Shape "sphere" "float radius" [3]
     Translate -7 0 0
+    Rotate 90 0 0 1
     SetEmitter
     Shape "sphere" "float radius" [3]
 AttributeEnd

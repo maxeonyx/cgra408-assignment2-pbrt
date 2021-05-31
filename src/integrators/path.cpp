@@ -158,7 +158,8 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
                     float d = lengthInMedium.Length();
                     beta *= isect.primitive->GetMaterial()->Attenuation(d);
                 }
-            } else {
+            }
+            else {
                 float u = sampler.Get1D();
                 float magical_probability = 0.5; // probability of trying to sample the magical transmission
                 // randomly choose whether this ray came from the other side of the
@@ -170,7 +171,7 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
                         Vector3f lengthInMedium = isect.p - depthSi.p;
                         float d = lengthInMedium.Length();
                         // transform the current ray
-                        ray.d.z = ray.d.z * -1;
+                        isect.primitive->GetMaterial()->CameraFirstTransform(&ray);
                         //beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
                         beta /= magical_probability;
                     }
