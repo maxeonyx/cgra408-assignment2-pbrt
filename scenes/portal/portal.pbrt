@@ -1,4 +1,4 @@
-LookAt   0 -20 5   0 0 3   0 0 1
+LookAt   0 -20 2   0 0 0   0 0 1
 
 Camera "perspective" "float fov" [39]
 Film "image"
@@ -7,7 +7,7 @@ Film "image"
 
 Sampler "halton" "integer pixelsamples" [50]
 
-Integrator "path"
+Integrator "path" "integer maxdepth" [10]
 
 WorldBegin
 
@@ -21,14 +21,18 @@ AttributeEnd
 
 # PortalCrystal large absorptive Sphere
 AttributeBegin
-    Material "portalcrystal" "float index" [1.001] "float attenuation_length" [3]
-    Translate 3.5 0 3
-    SetAbsorber
-    Shape "sphere" "float radius" [3]
-    Translate -7 0 0
-    Rotate 90 0 0 1
-    SetEmitter
-    Shape "sphere" "float radius" [3]
+    Material "portalcrystal" "float index" [1.005] "float attenuation_length" [3]
+    AttributeBegin
+        Translate 3.5 0 0
+        Rotate 180 0 0 1
+        SetAbsorber
+        Shape "sphere" "float radius" [3]
+    AttributeEnd
+    AttributeBegin
+        Translate -3.5 0 0
+        SetEmitter
+        Shape "sphere" "float radius" [3]
+    AttributeEnd
 AttributeEnd
 
 

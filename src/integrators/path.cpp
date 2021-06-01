@@ -161,7 +161,7 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
             }
             else {
                 float u = sampler.Get1D();
-                float magical_probability = 0.5; // probability of trying to sample the magical transmission
+                float magical_probability = 1; // probability of trying to sample the magical transmission
                 // randomly choose whether this ray came from the other side of the
                 // crystal, or from the magical emission
                 if (u < magical_probability) {
@@ -172,8 +172,8 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
                         float d = lengthInMedium.Length();
                         // transform the current ray
                         isect.primitive->GetMaterial()->CameraFirstTransform(&ray);
-                        //beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
-                        beta /= magical_probability;
+//                        beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
+                        //beta /= magical_probability;
                     }
                 }
             }

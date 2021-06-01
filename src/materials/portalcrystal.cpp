@@ -77,14 +77,17 @@ namespace pbrt {
     }
 
     void PortalCrystalMaterial::CameraFirstTransform(RayDifferential *ray) const {
-        RayDifferential worldRay = Inverse(emitterTransform)(*ray);
-        RayDifferential destRay = absorberTransform(worldRay);
+        // transform into object space (which we assume is identical for the two objects),
+        // then back to world space
+
+        RayDifferential worldRay = emitterTransform(*ray);
+        RayDifferential destRay = Inverse(absorberTransform)(worldRay);
         *ray = destRay;
     }
 
     void PortalCrystalMaterial::LightFirstTransform(RayDifferential *ray) const {
-        RayDifferential worldRay = Inverse(absorberTransform)(*ray);
-        RayDifferential destRay = emitterTransform(worldRay);
+        RayDifferential worldRay = absorberTransform(*ray);
+        RayDifferential destRay = Inverse(emitterTransform)(worldRay);
         *ray = destRay;
     }
 
