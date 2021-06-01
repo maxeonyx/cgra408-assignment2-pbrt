@@ -45,6 +45,11 @@
 
 namespace pbrt {
 
+    enum PortalPass {
+        Main,
+        PortalEmission,
+    };
+
 // PathIntegrator Declarations
 class PathIntegrator : public SamplerIntegrator {
   public:
@@ -56,9 +61,11 @@ class PathIntegrator : public SamplerIntegrator {
 
     void Preprocess(const Scene &scene, Sampler &sampler);
     Spectrum Li(const RayDifferential &ray, const Scene &scene,
-                Sampler &sampler, MemoryArena &arena, int depth) const;
+                Sampler &sampler, MemoryArena &arena, int depth) const override;
 
   private:
+    Spectrum LiHelper(const RayDifferential &ray, const Scene &scene,
+                      Sampler &sampler, MemoryArena &arena, int depth, PortalPass pass) const;
     // PathIntegrator Private Data
     const int maxDepth;
     const Float rrThreshold;

@@ -45,6 +45,7 @@ namespace pbrt {
 STAT_PERCENT("Integrator/Zero-radiance paths", zeroRadiancePaths, totalPaths);
 STAT_INT_DISTRIBUTION("Integrator/Path length", pathLength);
 
+
 // PathIntegrator Method Definitions
 PathIntegrator::PathIntegrator(int maxDepth,
                                std::shared_ptr<const Camera> camera,
@@ -62,8 +63,16 @@ void PathIntegrator::Preprocess(const Scene &scene, Sampler &sampler) {
 }
 
 Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
-                            Sampler &sampler, MemoryArena &arena,
-                            int depth) const {
+                                  Sampler &sampler, MemoryArena &arena,
+                                  int depth) const {
+    Spectrum mainL = LiHelper(r, scene, sampler, arena, depth, PortalPass::Main);
+    Spectrum portalEmissionL = LiHelper(r, scene, sampler, arena, depth, PortalPass::PortalEmission);
+    return mainL + portalEmissionL;
+}
+
+Spectrum PathIntegrator::LiHelper(const RayDifferential &r, const Scene &scene,
+                                  Sampler &sampler, MemoryArena &arena,
+                                  int depth, PortalPass pass) const {
     ProfilePhase p(Prof::SamplerIntegratorLi);
     Spectrum L(0.f), beta(1.f);
     RayDifferential ray(r);
@@ -78,6 +87,8 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
     // out of a medium and thus have their beta value increased.
     Float etaScale = 1;
 
+    bool didTeleport = false;
+
     for (bounces = 0;; ++bounces) {
         // Find next path vertex and accumulate contribution
         VLOG(2) << "Path tracer bounce " << bounces << ", current L = " << L
@@ -85,7 +96,10 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
 
         // Intersect _ray_ with scene and store intersection in _isect_
         SurfaceInteraction isect;
+        RayDifferential ray2 = ray;
         bool foundIntersection = scene.Intersect(ray, &isect);
+        foundIntersection = scene.Intersect(ray2, &isect);
+        //foundIntersection = scene.Intersect(ray, &isect);
 
         // Possibly add emitted light at intersection
         if (bounces == 0 || specularBounce) {
@@ -149,32 +163,31 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         }
         ray = isect.SpawnRay(wi);
 
-        if (isect.primitive->GetMaterial()->IsPortal()) {
+        // if this is the portal material, and the bsdf sample was transmitted not reflected by the fresnel, and the ray is entering not exiting.
+        if (isect.primitive->GetMaterial()->IsPortal() && (flags & BSDF_TRANSMISSION) && Dot(wo, isect.n) > 0) {
             if (isect.shape->absorby) {
                 SurfaceInteraction depthSi;
-                bool foundDepthIntersect = scene.Intersect(ray, &depthSi);
+                RayDifferential depthRay = ray;
+                bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
                 if (foundDepthIntersect) {
                     Vector3f lengthInMedium = isect.p - depthSi.p;
                     float d = lengthInMedium.Length();
                     beta *= isect.primitive->GetMaterial()->Attenuation(d);
                 }
             }
-            else {
-                float u = sampler.Get1D();
-                float magical_probability = 1; // probability of trying to sample the magical transmission
-                // randomly choose whether this ray came from the other side of the
-                // crystal, or from the magical emission
-                if (u < magical_probability) {
-                    SurfaceInteraction depthSi;
-                    bool foundDepthIntersect = scene.Intersect(ray, &depthSi);
-                    if (foundDepthIntersect) {
-                        Vector3f lengthInMedium = isect.p - depthSi.p;
-                        float d = lengthInMedium.Length();
-                        // transform the current ray
-                        isect.primitive->GetMaterial()->CameraFirstTransform(&ray);
-//                        beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
-                        //beta /= magical_probability;
-                    }
+            else if (pass == PortalPass::PortalEmission) {
+                SurfaceInteraction depthSi;
+                RayDifferential depthRay = ray;
+                bool foundDepthIntersect = scene.Intersect(depthRay, &depthSi);
+
+                if (foundDepthIntersect) {
+                    didTeleport = true;
+                    Vector3f lengthInMedium = isect.p - depthSi.p;
+                    float d = lengthInMedium.Length();
+                    // transform the current ray
+                    isect.primitive->GetMaterial()->CameraFirstTransform(&ray);
+                    beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
+                    //beta /= magical_probability;
                 }
             }
         }
@@ -214,6 +227,11 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
         }
     }
     ReportValue(pathLength, bounces);
+
+    if (pass == PortalPass::PortalEmission && !didTeleport) {
+        return Spectrum(0);
+    }
+
     return L;
 }
 

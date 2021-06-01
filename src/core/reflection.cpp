@@ -562,11 +562,6 @@ Spectrum PortalFresnelSpecular::Sample_f(const Vector3f &wo, Vector3f *wi,
         if (sampledType)
             *sampledType = BxDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
         *pdf = 1 - F;
-
-
-
-
-
         return ft / AbsCosTheta(*wi);
     }
 }
