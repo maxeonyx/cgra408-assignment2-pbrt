@@ -67,6 +67,8 @@ Spectrum PathIntegrator::Li(const RayDifferential &r, const Scene &scene,
                                   int depth) const {
     Spectrum mainL = LiHelper(r, scene, sampler, arena, depth, PortalPass::Main);
     Spectrum portalEmissionL = LiHelper(r, scene, sampler, arena, depth, PortalPass::PortalEmission);
+//    return portalEmissionL;
+//    return mainL;
     return mainL + portalEmissionL;
 }
 
@@ -187,7 +189,6 @@ Spectrum PathIntegrator::LiHelper(const RayDifferential &r, const Scene &scene,
                     // transform the current ray
                     isect.primitive->GetMaterial()->CameraFirstTransform(&ray);
                     beta *= 1 - isect.primitive->GetMaterial()->Attenuation(d);
-                    //beta /= magical_probability;
                 }
             }
         }
