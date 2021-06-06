@@ -6,3 +6,4 @@ src/objs
 /build
 /cmake-build*
 *.blend1
+*.obj
