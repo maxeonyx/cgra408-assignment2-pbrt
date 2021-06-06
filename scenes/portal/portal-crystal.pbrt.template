@@ -1,0 +1,40 @@
+LookAt   0 -100 30   0 0 0   0 0 1
+
+Rotate %%SCENE_ROTATION%% 0 0 1
+Camera "perspective" "float fov" [39]
+Film "image"
+    "integer xresolution" [700] "integer yresolution" [700]
+    "string filename" "%%FILENAME%%"
+
+Sampler "halton" "integer pixelsamples" [10]
+
+Integrator "path" "integer maxdepth" [10]
+
+WorldBegin
+
+#sky
+AttributeBegin
+    Rotate -60 0 0 1
+    LightSource "infinite"
+            "string mapname" [ "textures/doge2_latlong.exr" ]
+            "rgb scale" [ 1. 1. 1. ]
+AttributeEnd
+
+# PortalCrystal large absorptive Sphere
+AttributeBegin
+    Material "portalcrystal" "float index" [1.7] "float attenuation_length" [%%ATTENUATION%%]
+    AttributeBegin
+        Translate 20 0 0
+        Rotate %%ABSORBER_ROTATION%% 0 0 1
+        SetAbsorber
+        Include "emitter_crystal.pbrt"
+    AttributeEnd
+    AttributeBegin
+        Translate -20 0 0
+        SetEmitter
+        Include "emitter_crystal.pbrt"
+    AttributeEnd
+AttributeEnd
+
+
+WorldEnd

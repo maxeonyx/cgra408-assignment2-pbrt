@@ -1,7 +1,8 @@
 # Converted from "scenes/portal/EmitterCrystal.obj" by obj2pbrt
 # Scene bounds: (438.527740, 217.036240, -468.206268) - (468.547455, 236.374023, -438.186584)
 
-
+Rotate 90 1 0 0
+Translate -453.5375975 -226.7051315 453.196426
 # Name "Emitter8"
 AttributeBegin
 # Material unspecified in OBJ file
