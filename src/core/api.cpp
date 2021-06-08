@@ -119,6 +119,7 @@
 #include <stdio.h>
 #include <materials/wood.h>
 #include <materials/portalcrystal.h>
+#include <textures/pounamu.h>
 
 namespace pbrt {
 
@@ -672,6 +673,8 @@ std::shared_ptr<Texture<Spectrum>> MakeSpectrumTexture(
         tex = CreateDotsSpectrumTexture(tex2world, tp);
     else if (name == "fbm")
         tex = CreateFBmSpectrumTexture(tex2world, tp);
+    else if (name == "pounamu")
+        tex = CreatePounamuSpectrumTexture(tex2world, tp);
     else if (name == "wrinkled")
         tex = CreateWrinkledSpectrumTexture(tex2world, tp);
     else if (name == "marble")
